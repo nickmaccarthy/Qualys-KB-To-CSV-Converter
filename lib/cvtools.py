@@ -11,29 +11,15 @@ import cvtools
 
 CV_HOME = os.environ.get('CV_HOME')
 
+''' fixes errant non ascii issues that come from the kb '''
 def sanitize_dict(dictionary):
-    
     retd = {}
     for k,v in dictionary.iteritems():
         if v is not None:
             retd[k] = v.encode('ascii', 'ignore')
     return retd
-    
-def help_def():
-    print "Downloads, parses and converts the Qualys Knowledgebase to CSV"
-    print "Outputs a file in %s called 'kb.csv'" % CV_HOME
-        
-def usage():
-    print "\n"
-    help_def()
-    print "\n\n"
-    
-    print "Usage:"
-    print "python converter.py --username=<qualys_useranme> --password=<qualys_password>" 
-    print "example: python converter.py --username=myuser --password=mYP4ssw0rd"
-    print "\n"
 
-
+''' read inputs from CLI '''    
 def readinputs(argv):
     try:
         optlist, args = getopt.getopt(argv, '', ['username=', 'password='])
@@ -51,7 +37,7 @@ def readinputs(argv):
 
     return returnDict
 
-
+''' Downloads the qualys kb '''
 def download_kb(username, password):
     try:
         r = requests.post("https://qualysapi.qualys.com/msp/knowledgebase_download.php?show_cvss_submetrics=1&show_pci_flag=1", auth=(username, password), stream=True)
@@ -65,8 +51,8 @@ def download_kb(username, password):
 
     return True
 
+''' Parses and converts the qualys KB xml to csv '''
 def convert_kb():
-
     with open(os.path.join(CV_HOME, 'qualys_kb.xml'), 'r') as f, open(os.path.join(CV_HOME, 'kb.csv'), 'wb') as w:
         
         csv_headers = [ 'QID', 'TYPE', 'SEVERITY_LEVEL', 'TITLE', 'CATEGORY', 'LAST_UPDATE', 'PATCHABLE', 'CVE_ID', 'BUGTRAQ_ID', 'DIAGNOSIS', 'CONSEQUENCE', 'SOLUTION', 'COMPLIANCE_TYPE', 'COMPLIANCE_SECTOION', 'COMPLIANCE_DESCRIPTION', 'CVSS_BASE', 'CVSS_TEMPORAL', 'CVSS_AUTHENTICATION', 'CVSS_ACCESS_VECTOR', 'CVSS_ACCESS_COMPLEXITY', 'CVSS_AUTENTICATION', 'CVSS_CONFIDENTIALITY_IMPACT', 'CVSS_INTEGRITY_IMPACT', 'CVSS_AVAILABILITY_IMPACT', 'CVSS_EXPLOITABILITY', 'CVSS_REMEDIATION_LEVEL', 'CVSS_REPORT_CONFIDENCE', 'COMPLIANCE_TYPE', 'COMPLIANCE_SECTION', 'COMPLIANCE_DESCRIPTION', 'PCI_FLAG' ]
@@ -128,5 +114,19 @@ def convert_kb():
 
             dw.writerow(cvtools.sanitize_dict(kb))
             count += 1
-            print count
     return
+
+def usage():
+    print "\n"
+    help_def()
+    print "\n\n"
+    
+    print "Usage:"
+    print "python converter.py --username=<qualys_useranme> --password=<qualys_password>" 
+    print "example: python converter.py --username=myuser --password=mYP4ssw0rd"
+    print "\n"
+
+def help_def():
+    print "Downloads, parses and converts the Qualys Knowledgebase to CSV"
+    print "Outputs a file in %s called 'kb.csv'" % CV_HOME
+        
