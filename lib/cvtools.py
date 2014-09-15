@@ -74,7 +74,8 @@ def convert_kb():
         dw.writeheader()
          
         kbx = simplexml.loads(f.read())
-        
+       
+        count = 1 
         vulns = []
         kb = {}
         for ev in kbx['VULNS']['VULN']:
@@ -92,8 +93,6 @@ def convert_kb():
                         btlist.append(bt['BUGTRAQ_ID']['ID'])
                 if len(btlist) > 1:
                     kb['BUGTRAQ_ID'] = ','.join(btlist)
-                else:
-                    continue
             
             kb['PATCHABLE'] = ev.get('PATCHABLE')
 
@@ -104,8 +103,6 @@ def convert_kb():
                         cvelist.append(cveid['ID'])
                 if len(cvelist) > 1:
                     kb['CVE_ID'] = ','.join(cvelist)
-                else:
-                    continue
 
             kb['DIAGNOSIS'] = ev.get('DIAGNOSIS')
             kb['CONSEQUENCE'] = ev.get('CONSEQUENCE')
@@ -130,5 +127,6 @@ def convert_kb():
             kb['PCI_FLAG'] = ev.get('PCI_FLAG')
 
             dw.writerow(cvtools.sanitize_dict(kb))
-
+            count += 1
+            print count
     return

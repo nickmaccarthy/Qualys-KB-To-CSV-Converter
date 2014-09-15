@@ -14,7 +14,6 @@ import simplexml
 import cvtools
 
 def main(argv):
-
     opts = cvtools.readinputs(argv)
         
     if not opts['username'] and not opts['password']:
